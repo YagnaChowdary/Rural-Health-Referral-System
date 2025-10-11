@@ -9,7 +9,7 @@ export default API;*/
 import axios from 'axios';
 
 const API = axios.create({
-  baseURL: 'http://localhost:5000/api'
+  baseURL: 'https://rural-health-referral-system.onrender.com'
 });
 
 // This is an "interceptor". It runs before every single request.
