@@ -216,8 +216,8 @@ export default App;*/
 // frontend/src/App.js
 import React from 'react';
 import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
-import PHC_Page from './pages/PHC_Page';
-import Hospital_Page from './pages/Hospital_Page';
+import PhcPage from './pages/PHC_Page';
+import HospitalPage from './pages/Hospital_Page';
 import LoginPage from './pages/Login_Page';
 import ProtectedRoute from './components/ProtectedRoute';
 import { getUserRole } from './utils/auth'; // <-- 1. Import
@@ -277,7 +277,7 @@ function App() {
                 path="/"
                 element={
                   <ProtectedRoute roles={['PHC_STAFF']}>
-                    <PHC_Page />
+                    <PhcPage />
                   </ProtectedRoute>
                 }
               />
@@ -285,7 +285,7 @@ function App() {
                 path="/dashboard"
                 element={
                   <ProtectedRoute roles={['DISTRICT_STAFF']}>
-                    <Hospital_Page />
+                    <HospitalPage />
                   </ProtectedRoute>
                 }
               />
