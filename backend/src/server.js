@@ -1,3 +1,5 @@
+require('dotenv').config();
+
 console.log("Starting server.js...");
 require('./jobs/escalationWorker'); 
 const app = require('./app');
