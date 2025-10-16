@@ -26,7 +26,16 @@ const visitRoutes = require('./routes/visitRoutes');
 const referralRoutes = require('./routes/referralRoutes'); 
 const hospitalRoutes = require('./routes/hospitalRoutes');
 const authRoutes = require('./routes/authRoutes');
-
+const allowedOrigins = ['http://localhost:3000', 'https://rural-health-referral-system.netlify.app/'];
+const corsOptions = {
+  origin: function (origin, callback) {
+    if (!origin || allowedOrigins.indexOf(origin) !== -1) {
+      callback(null, true);
+    } else {
+      callback(new Error('Not allowed by CORS'));
+    }
+  },
+};
 app.use(cors());
 app.use(express.json());
 
