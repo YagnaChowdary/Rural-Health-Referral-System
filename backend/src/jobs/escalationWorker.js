@@ -53,7 +53,7 @@ cron.schedule('* * * * *', async () => {
 });*/
 
 
-const cron = require('node-cron');
+/*const cron = require('node-cron');
 const twilio = require('twilio');
 
 // ❌ REMOVE THIS LINE - We will pass the pool in.
@@ -102,6 +102,63 @@ module.exports = (pool) => {
       }
     } catch (err) {
       console.error('Error in scheduled job:', err);
+    }
+  });
+};
+
+*/
+
+
+const cron = require('node-cron');
+const twilio = require('twilio');
+
+// ❌ REMOVE THIS LINE. The pool will be passed in.
+// const pool = require('../config/db');
+
+// ✅ WRAP the logic in an exported function that accepts 'pool'.
+module.exports = (pool) => {
+  const client = twilio(process.env.TWILIO_SID, process.env.TWILIO_TOKEN);
+  const ANO_PHONE_NUMBER = '+916009642220';
+
+  console.log('Escalation worker configured. Will check for overdue referrals.');
+
+  cron.schedule('* * * * *', async () => {
+    console.log('Running scheduled job: Checking for overdue referrals...');
+    try {
+      // This now uses the 'pool' that was passed into the function.
+      const overdueReferrals = await pool.query(`
+        SELECT r.id, p.name as patient_name
+        FROM referrals r
+        JOIN visits v ON r.visit_id = v.id
+        JOIN patients p ON v.patient_id = p.id
+        WHERE r.status = 'REFERRED'
+          AND now() > r.referral_date + (r.urgency_hours * interval '1 hour')
+      `);
+
+      if (overdueReferrals.rows.length === 0) {
+        console.log('No overdue referrals found.');
+        return;
+      }
+
+      for (const referral of overdueReferrals.rows) {
+        console.log(`Processing overdue referral for patient: ${referral.patient_name} (ID: ${referral.id})`);
+        
+        await client.messages.create({
+          body: `ALERT: Patient ${referral.patient_name} (Referral ID: ${referral.id}) is overdue. Please follow up.`,
+          from: process.env.TWILIO_PHONE,
+          to: ANO_PHONE_NUMBER
+        });
+        console.log(`SMS sent for referral ID: ${referral.id}`);
+
+        await pool.query(
+          "UPDATE referrals SET status = 'ESCALATED' WHERE id = $1",
+          [referral.id]
+        );
+        console.log(`Referral ID ${referral.id} status updated to ESCALATED.`);
+      }
+    } catch (err) {
+      // Add a more specific error log for the job
+      console.error('Error executing scheduled job:', err);
     }
   });
 };
