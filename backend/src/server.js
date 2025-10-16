@@ -43,11 +43,12 @@ const pool = require('./config/db'); // This creates the main, successful pool.
 const app = require('./app');
 
 // ✅ Pass the healthy pool to the worker to start it.
-startEscalationWorker(pool);
+
 
 const PORT = process.env.PORT || 10000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT} 🚀`);
+  startEscalationWorker(pool);
 });
 
