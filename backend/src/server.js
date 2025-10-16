@@ -11,7 +11,7 @@ const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
   console.log(`Server running on port ${PORT} 🚀`);
-});*/
+});
 
 require('dotenv').config(); // This must remain the very first line
 
@@ -23,6 +23,26 @@ const pool = require('./config/db'); // This is the successfully created pool
 const app = require('./app');
 
 // ✅ Start the worker by passing the pool to it
+startEscalationWorker(pool);
+
+const PORT = process.env.PORT || 5000;
+
+app.listen(PORT, () => {
+  console.log(`Server running on port ${PORT} 🚀`);
+});*/
+
+
+// ✅ This MUST be the very first line of your file.
+require('dotenv').config(); 
+
+console.log("Starting server.js...");
+
+// ✅ Import the worker function AND the database pool.
+const startEscalationWorker = require('./jobs/escalationWorker');
+const pool = require('./config/db'); // This creates the main, successful pool.
+const app = require('./app');
+
+// ✅ Pass the healthy pool to the worker to start it.
 startEscalationWorker(pool);
 
 const PORT = process.env.PORT || 5000;
