@@ -299,7 +299,7 @@ const Navigation = () => {
 
 export default App;*/
 
-import React from 'react';
+/*import React from 'react';
 import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
 import PhcPage from './pages/PhcPage'; // <-- CORRECTED
 import HospitalPage from './pages/HospitalPage'; // <-- CORRECTED
@@ -368,6 +368,102 @@ function App() {
                 path="/dashboard"
                 element={
                   <ProtectedRoute roles={['DISTRICT_STAFF']}>
+                    <HospitalPage />
+                  </ProtectedRoute>
+                }
+              />
+            </Routes>
+          </div>
+        </header>
+      </div>
+    </BrowserRouter>
+  );
+}
+
+export default App;
+*/
+
+import React from 'react';
+import { BrowserRouter, Routes, Route, Link, useNavigate } from 'react-router-dom';
+import PhcPage from './pages/PhcPage'; //
+import HospitalPage from './pages/HospitalPage'; //
+import LoginPage from './pages/Login_Page'; //
+import RegisterPage from './pages/Register_Page'; // <-- 1. IMPORT THE NEW PAGE
+import ProtectedRoute from './components/ProtectedRoute'; //
+import { getUserRole } from './utils/auth'; //
+import './App.css'; //
+
+const Navigation = () => {
+  const navigate = useNavigate();
+  const userRole = getUserRole(); //
+  const isLoggedIn = !!userRole; //
+
+  const handleLogout = () => {
+    localStorage.removeItem('token'); //
+    navigate('/login'); //
+  };
+
+  return (
+    <nav style={{ padding: '20px', backgroundColor: '#282c34', width: '100%', display: 'flex', justifyContent: 'space-between' }}>
+      <div>
+        {/* Conditional links based on role */}
+        {userRole === 'PHC_STAFF' && ( //
+          <Link to="/" style={{ margin: '15px', color: 'white', fontSize: '1.2em' }}>
+            PHC Form
+          </Link>
+        )}
+        {userRole === 'DISTRICT_STAFF' && ( //
+          <Link to="/dashboard" style={{ margin: '15px', color: 'white', fontSize: '1.2em' }}>
+            Hospital Dashboard
+          </Link>
+        )}
+      </div>
+      <div>
+        {isLoggedIn ? ( //
+          <button onClick={handleLogout} style={{ margin: '0 15px', fontSize: '1em', cursor: 'pointer' }}>
+            Logout
+          </button>
+        ) : (
+          <>
+            {/* 2. ADD SIGN UP LINK NEXT TO LOGIN */}
+            <Link to="/login" style={{ margin: '15px', color: 'white', fontSize: '1.2em' }}>
+              Login
+            </Link>
+            <Link to="/register" style={{ margin: '15px', color: 'white', fontSize: '1.2em' }}>
+              Sign Up
+            </Link>
+          </>
+        )}
+      </div>
+    </nav>
+  );
+};
+
+function App() {
+  return (
+    <BrowserRouter>
+      <div className="App">
+        <header className="App-header">
+          <Navigation />
+          <div style={{ padding: '20px' }}>
+            <Routes>
+              {/* 3. ADD THE NEW ROUTE FOR /register */}
+              <Route path="/login" element={<LoginPage />} />
+              <Route path="/register" element={<RegisterPage />} /> 
+
+              {/* Protected Routes */}
+              <Route
+                path="/"
+                element={
+                  <ProtectedRoute roles={['PHC_STAFF']}> {/* */}
+                    <PhcPage />
+                  </ProtectedRoute>
+                }
+              />
+              <Route
+                path="/dashboard"
+                element={
+                  <ProtectedRoute roles={['DISTRICT_STAFF']}> {/* */}
                     <HospitalPage />
                   </ProtectedRoute>
                 }
